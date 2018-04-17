@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <I2C_Anything.h>
 #define R 1
 
 byte last_channel_1, last_channel_2, last_channel_3;
@@ -60,7 +61,7 @@ void loop() {
   X4=X3;
   Y4=Y1;
   
-  Ang1=atan2(Y1, X1)*180/3.1416; //Calculating anlges from respective vector components (See Swerve_Analysis)
+  Ang1=atan2(Y1, X1)*180/3.1416; //Calculating angles from respective vector components (See Swerve_Analysis)
   Ang2=atan2(Y2, X2)*180/3.1416;
   Ang3=atan2(Y3, X3)*180/3.1416;
   Ang4=atan2(Y4, X4)*180/3.1416;
@@ -122,16 +123,24 @@ void loop() {
 
  
   Wire.beginTransmission(8); //sending payloads as a byte for angle and a byte for speed (2  bytes total for each slave)
-  Wire.write(payload1,2);
+  //Wire.write(payload1,2);
+  I2C_writeAnything(Ang1 + 180);
+  I2C_writeAnything(payload1[2]);
   Wire.endTransmission();
   Wire.beginTransmission(9);
-  Wire.write(payload2,2);
+  //Wire.write(payload2,2);
+  I2C_writeAnything(Ang2 + 180);
+  I2C_writeAnything(payload2[1]);
   Wire.endTransmission();
   Wire.beginTransmission(10);
-  Wire.write(payload3,2);
+  //Wire.write(payload3,2);
+  I2C_writeAnything(Ang3 + 180);
+  I2C_writeAnything(payload3[1]);
   Wire.endTransmission();
   Wire.beginTransmission(11);
-  Wire.write(payload4,2);
+  //Wire.write(payload4,2);
+  I2C_writeAnything(Ang4 + 180);
+  I2C_writeAnything(payload4[1]);
   Wire.endTransmission();
   
   loop_timer=micros()-loop_timer;
@@ -176,8 +185,6 @@ ISR(PCINT0_vect){
   totalAm=sqrt(sq(X_norm)+sq(Y_norm)+sq(W_norm));
   rotPriority=abs(W_norm)/(transAm+abs(W_norm)+(1-(totalAm/1.732))); //1.732 = sqrt(3)
   transPriority=transAm/(transAm+abs(W_norm)+(1-(totalAm/1.732))); //1.732 = sqrt(3)
-
-
   X1=X_norm*transPriority+0.707*W_norm*rotPriority; //Vector math from swerve drive superposition analysis (See Swerve_Analysis)
   Y1=Y_norm*transPriority+0.707*W_norm*rotPriority;
   X2=X1;
@@ -187,4 +194,3 @@ ISR(PCINT0_vect){
   X4=X3;
   Y4=Y1;
   */
-
