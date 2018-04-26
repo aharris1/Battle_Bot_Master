@@ -23,7 +23,7 @@ void setup() {
   delay(10);
   Wire.begin(); //initialize I2C for Master Device
   loop_timer = micros();
-  Serial.begin(9600);
+  //Serial.begin(9600);
   pinMode(13, OUTPUT);
   digitalWrite(A4, LOW);
   digitalWrite(A5, LOW);
@@ -204,7 +204,7 @@ void loop() {
     I2C_writeAnything(payload1[1]);
     //int sendMe = 1*loopCounter;
     //I2C_writeAnything(sendMe);
-    Serial.println(Ang1);
+    //Serial.println(Ang1);
     Wire.endTransmission();
     Wire.beginTransmission(9);
     //Wire.write(payload2,2);
@@ -249,6 +249,32 @@ void loop() {
     */
     delay(10);
     loopCounter++;
+  }
+  else{
+    Wire.beginTransmission(8); //sending payloads as a byte for angle and a byte for speed (2  bytes total for each slave)
+    //Wire.write(payload1,2);
+
+    I2C_writeAnything(0);
+    I2C_writeAnything((byte)127);
+    //int sendMe = 1*loopCounter;
+    //I2C_writeAnything(sendMe);
+    //Serial.println(Ang1);
+    Wire.endTransmission();
+    Wire.beginTransmission(9);
+    //Wire.write(payload2,2);
+    I2C_writeAnything(0);
+    I2C_writeAnything((byte)127);
+    Wire.endTransmission();
+    Wire.beginTransmission(10);
+    //Wire.write(payload3,2);
+    I2C_writeAnything(0);
+    I2C_writeAnything((byte)127);
+    Wire.endTransmission();
+    Wire.beginTransmission(11);
+    //Wire.write(payload4,2);
+    I2C_writeAnything(0);
+    I2C_writeAnything((byte)127);
+    Wire.endTransmission();
   }
 }
 //This routine is called every time input 8, 9, 10 or 11 changed state and is used to measure pulse length of receiver channels
