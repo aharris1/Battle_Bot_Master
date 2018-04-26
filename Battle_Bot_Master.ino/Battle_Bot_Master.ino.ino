@@ -11,6 +11,10 @@ float X1, X2, X3, X4, Y1, Y2, Y3, Y4, M1, M2, M3, M4;
 unsigned long loop_timer = 0; //used to measure total loop time if desired
 float transAm, totalAm, X_norm, Y_norm, W_norm, rotPriority, transPriority, max_XY, max_Mov, total_Mov;
 int loopCounter = 0;
+int SmoothedAng1 = 0;
+int SmoothedAng2 = 0;
+int SmoothedAng3 = 0;
+int SmoothedAng4 = 0;
 void setup() {
   PCICR |= (1 << PCIE0);    // set PCIE0 to enable PCMSK0 scan
   PCMSK0 |= (1 << PCINT2);  // set PCINT2 (digital input 10)to trigger an interrupt on state change
@@ -116,6 +120,10 @@ void loop() {
     Ang2 = (int)(atan2(Y2, X2) * (180 / 3.1416) + 180);
     Ang3 = (int)(atan2(Y3, X3) * (180 / 3.1416) + 180);
     Ang4 = (int)(atan2(Y4, X4) * (180 / 3.1416) + 180);
+    SmoothedAng1 = SmoothedAng1*.8 + Ang1 * .2;
+    SmoothedAng2 = SmoothedAng1*.8 + Ang2 * .2;
+    SmoothedAng3 = SmoothedAng1*.8 + Ang3 * .2;
+    SmoothedAng4 = SmoothedAng1*.8 + Ang4 * .2;
     //Serial.println("Point 2");
     /*
       Serial.print("Angle 1: ");
@@ -192,7 +200,7 @@ void loop() {
     Wire.beginTransmission(8); //sending payloads as a byte for angle and a byte for speed (2  bytes total for each slave)
     //Wire.write(payload1,2);
 
-    I2C_writeAnything(Ang1);
+    I2C_writeAnything(SmoothedAng1);
     I2C_writeAnything(payload1[1]);
     //int sendMe = 1*loopCounter;
     //I2C_writeAnything(sendMe);
@@ -200,18 +208,18 @@ void loop() {
     Wire.endTransmission();
     Wire.beginTransmission(9);
     //Wire.write(payload2,2);
-    I2C_writeAnything(Ang2);
-    //I2C_writeAnything(payload2[1]);
+    I2C_writeAnything(SmoothedAng2);
+    I2C_writeAnything(payload2[1]);
     Wire.endTransmission();
     Wire.beginTransmission(10);
     //Wire.write(payload3,2);
-    I2C_writeAnything(Ang3);
-    //I2C_writeAnything(payload3[1]);
+    I2C_writeAnything(SmoothedAng3);
+    I2C_writeAnything(payload3[1]);
     Wire.endTransmission();
     Wire.beginTransmission(11);
     //Wire.write(payload4,2);
-    I2C_writeAnything(Ang4);
-    //I2C_writeAnything(payload4[1]);
+    I2C_writeAnything(SmoothedAng4);
+    I2C_writeAnything(payload4[1]);
     Wire.endTransmission();
     /*
       delay(250);
